@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EventModal from './AddEventModel';
+import { motion } from 'framer-motion';
 import '../App.css'
-
 const Home = ({ user, onLogout }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState({});
@@ -30,7 +30,7 @@ const Home = ({ user, onLogout }) => {
     const days = [];
 
     for (let i = 0; i < firstDay.getDay(); i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day"></div>);
+      days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -39,16 +39,18 @@ const Home = ({ user, onLogout }) => {
       const hasEvents = events[dateString] && events[dateString].length > 0;
 
       days.push(
-        <div
+        <motion.div
           key={dateString}
           className={`calendar-day ${date.getDay() === 0 || date.getDay() === 6 ? 'weekend' : ''} ${
             date.toDateString() === new Date().toDateString() ? 'today' : ''
           }`}
           onClick={() => handleDayClick(date)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
-          {day}
+          <span className="day-number">{day}</span>
           {hasEvents && <div className="event-indicator"></div>}
-        </div>
+        </motion.div>
       );
     }
 
@@ -69,11 +71,15 @@ const Home = ({ user, onLogout }) => {
   };
 
   return (
-    <div>
+    <div className="calendar-container">
       <div className="calendar-header">
-        <button onClick={handlePrevMonth}>Previous</button>
-        <h2>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
-        <button onClick={handleNextMonth}>Next</button>
+        <h1>{user.name}'s Calendar</h1>
+        <div className="calendar-controls">
+          <button onClick={handlePrevMonth}>&lt;</button>
+          <h2>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
+          <button onClick={handleNextMonth}>&gt;</button>
+        </div>
+        <button onClick={onLogout} className="logout-button">Logout</button>
       </div>
       <div className="filter-container">
         <input
@@ -84,7 +90,6 @@ const Home = ({ user, onLogout }) => {
         />
       </div>
       <div className="calendar-grid">{renderCalendar()}</div>
-      <button onClick={onLogout}>Logout</button>
       {showModal && selectedDate && (
         <EventModal
           date={selectedDate}
@@ -99,4 +104,3 @@ const Home = ({ user, onLogout }) => {
 };
 
 export default Home;
-
